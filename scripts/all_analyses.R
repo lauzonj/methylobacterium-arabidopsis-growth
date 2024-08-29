@@ -9,9 +9,9 @@
 # SETTING UP ----
 
 ## load packages ----
-library(dplyr)
-library(tidyr)
-#library(tidyverse)
+#library(dplyr)
+#library(tidyr)
+library(tidyverse)
 library(ggplot2)
 library(lmerTest)
 #library(car)
