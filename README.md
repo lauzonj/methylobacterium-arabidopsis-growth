@@ -25,14 +25,25 @@ A to L : proportion (relative abundance) of each strain in the community associa
 ## Methylobacterium strains
 
 A: E-046
+
 B: J-078
+
 C: J-088
+
 D: J-059
+
 E: J-043
+
 F: J-067
+
 G: J-048
+
 H: J-076
+
 I: E-045
+
 J: J-092
+
 K: E-005
+
 L: J-068
