@@ -1,9 +1,7 @@
-# Richness and composition of phyllosphere Methylobacterium communities cause 
-# variation in Arabidopsis thaliana growth
+# Richness and composition of phyllosphere Methylobacterium communities 
+# cause variation in Arabidopsis thaliana growth
 # Authors of script : Jocelyn Lauzon and Jérémie Pelletier
-# Version : August, 2024
-# This script covers all the statistical analys2s.
-
+# This script covers all the statistical analyses and figures of the experiment.
 
 ###############################################################################-
 
@@ -11,11 +9,12 @@
 # SETTING UP ----
 
 ## load packages ----
-#library(dplyr)
-library(tidyverse)
-#library(ggplot2)
+library(dplyr)
+library(tidyr)
+#library(tidyverse)
+library(ggplot2)
 library(lmerTest)
-library(car)
+#library(car)
 library(MuMIn)
 library(emmeans)
 
