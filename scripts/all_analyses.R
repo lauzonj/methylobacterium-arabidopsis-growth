@@ -9,12 +9,9 @@
 # SETTING UP ----
 
 ## load packages ----
-#library(dplyr)
-#library(tidyr)
 library(tidyverse)
 library(ggplot2)
 library(lmerTest)
-#library(car)
 library(MuMIn)
 library(emmeans)
 
@@ -30,7 +27,7 @@ length(which(biom_data_raw$molds))
 biom_data <- subset(biom_data_raw, biom_data_raw$molds != TRUE)
 biom_data <- subset(biom_data, select = -4) # remove "molds" column
 
-## biomass dataframe modifications ----
+## biom_data dataframe adjustments ----
 biom_data$diversity <- as.numeric(biom_data$diversity)
 biom_data$comm[biom_data$comm == "Z"] <- "control" # change letter Z to "control" for control plants
 biom_data$comm <- as.factor(biom_data$comm)
@@ -41,43 +38,16 @@ biom_data$shelf_y <- as.factor(biom_data$shelf_y)
 class(biom_data)
 summary(biom_data)
 str(biom_data)
-saveRDS(biom_data, "./data/biom_data.rds")
 
-## biomass dataframe preparation for leaf biomass analysis (without diversity 0) ----
+## biom_data dataframe preparation for leaf biomass analysis (without diversity 0) ----
 data_lb.d <- subset(biom_data, biom_data$diversity != 0) # remove control plants
 data_lb.d <- droplevels(data_lb.d)
-#data_lb.d <- data.frame(data_lb.d)
 data_lb.d <- na.omit(data_lb.d) # remove rows with NA
 class(data_lb.d)
 summary(data_lb.d)
 str(data_lb.d)
 
-## TO REMOVE NEXT 9 LINES
-## biomass dataframe preparation for leaf biomass analysis (with control plants) ----
-data_lb.d.0 <- droplevels(data_lb.d.0)
-data_lb.d.0 <- data.frame(data_lb.d.0)
-data_lb.d.0 <- na.omit(data_lb.d.0) # remove rows with NA
-data_lb.d.0$inoc <- ifelse(as.character(data_lb.d.0$comm)=="control","control","inoculated")
-data_lb.d.0$inoc <- as.factor(data_lb.d.0$inoc)
-class(data_lb.d.0)
-summary(data_lb.d.0)
-str(data_lb.d.0)
-
-## TO REMOVE NEXT 12 LINES
-## biomass dataframe preparation for leaf biomass MONOCULTURES analysis (with control plants) ----
-data_lb.d.mono <- droplevels(data_lb.d.mono)
-data_lb.d.mono <- data.frame(data_lb.d.mono)
-data_lb.d.mono <- na.omit(data_lb.d.mono) # remove rows with NA
-data_lb.d.mono <- data_lb.d.mono[data_lb.d.mono$diversity!=2,]
-data_lb.d.mono <- data_lb.d.mono[data_lb.d.mono$diversity!=4,]
-data_lb.d.mono <- data_lb.d.mono[data_lb.d.mono$diversity!=6,]
-data_lb.d.mono <- data_lb.d.mono[data_lb.d.mono$diversity!=8,]
-data_lb.d.mono <- data_lb.d.mono[data_lb.d.mono$diversity!=10,]
-class(data_lb.d.mono)
-summary(data_lb.d.mono)
-str(data_lb.d.mono)
-
-## create data.lb.d.c dataframe (with 12 strains presence/absence) ----
+## create data.lb.d.c dataframe (containing the 12 strains presence/absence data) ----
 synthcomms <- synthcomms.raw[rownames(data_lb.d),c(1:12)] # match rows of 'synthcomms' to 'data_lb.d' and remove clades columns
 synthcomms_PA <- ifelse(synthcomms!=0, 1, 0) # create object with presence/absence data instead of relative abundance
 data_lb.d.c <- cbind(data_lb.d, synthcomms_PA)
@@ -85,10 +55,8 @@ data_lb.d.c  <- data_lb.d.c %>% mutate(across(c(A, B, C, D, E, F, G, H, I, J, K,
 class(data_lb.d.c)
 summary(data_lb.d.c)
 str(data_lb.d.c)
-saveRDS(synthcomms_PA, "./data/synthcomms_PA.rds")
-saveRDS(data_lb.d.c, "./data/data_lb.d.c.rds")
 
-
+  
 ###############################################################################-
 
 
@@ -113,35 +81,6 @@ model.sel(mod0.1, mod0.2)
 ###############################################################################-
 
 
-## TO REMOVE BELOW 
-
-# Levene's test
-mod.levene <- lm(leaf_biom ~ inoc, data = data_lb.d.0)
-summary(mod.levene)
-
-leveneTest(leaf_biom ~ inoc, data = data_lb.d.0)
-
-plot(leaf_biom ~ inoc, data = data_lb.d.0)
-tiff(filename = "./figures/control_vs_inoculated.tiff", width = 5.5, height = 5, units = "in", pointsize = 9, res=300)
-par(mfrow=c(1,1), mar=c(4.1, 4.1, 1.1, 1.1), font.lab = 2, cex = 1.3, cex.axis = 1.3) # margins order : bottom, left, top and right
-plot(leaf_biom ~ inoc, data = data_lb.d.0,
-     pch = 16, cex = 1, col = "white", cex.lab = 1.3,
-     xlab = "Treatment",
-     ylab = "Dry leaf biomass (mg)",
-     ylim = c(5, 65))
-points(jitter(as.numeric(data_lb.d.0$inoc), 0.5), data_lb.d.0$leaf_biom, col = "black", pch = 16, cex=0.8)
-dev.off()
-
-# ANOVA monocultures
-mod.mono <- lm(leaf_biom ~ comm, data = data_lb.d.mono)
-summary(mod.mono)
-
-## TO REMOVE ABOVE 
-
-
-###############################################################################-
-
-
 # H1 - GROWTH ~ DIVERSITY ---- 
 # Hypothesis 1
 
@@ -158,7 +97,7 @@ model.sel(mod0.1, modH1.1, modH1.2)
 
 ## postulates verification ----
 
-### Figure residuals ~ predicted ----
+### Appendix 1: Figure S1; residuals ~ predicted ----
 tiff(filename = "./figures/modH1-2_res-pred_and_QQplot.tiff", width = 6, height = 3, units = "in", pointsize = 7.5, res=300)
 par(mfrow=c(1,2), mar=c(5, 4, 1, 2))
 plot(scale(resid(modH1.2), center = T, scale = T) ~ fitted(modH1.2),
@@ -176,7 +115,7 @@ dev.off()
 # Model 1.2 with polynomial regression is better than Model 1.1 (non polynomial).
 # Polynomial regression will then be used for the other hypothesis analysis.
 
-## Figure ----
+## Figure 1 ----
 seq.div <- with(data_lb.d.c, seq(from = 0, to = 10, by = 0.01))
 
 prediction1.2.CI <- data.frame(predict(modH1.2, newdata=data.frame(diversity=seq.div[101:1001]),
@@ -195,8 +134,6 @@ plot(leaf_biom ~ diversity, data = data_lb.d.c,
 polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction1.2.CI$lwr, rev(prediction1.2.CI$upr)), col = rgb(0.2,0.2,0.2,0.2), border = NA)
 points(filter(biom_data, diversity == 0)$diversity, filter(biom_data, diversity == 0)$leaf_biom, col = "black", pch = 4, cex=0.8)
 points(seq.div[101:1001], prediction1.2.CI$fit, type = 'l', lty = "solid", lwd = 2, col = "black")
-#points(seq.div[101:1001], prediction1.2.CI$upr, type = 'l', lty = "dashed", lwd = 0.5, col = "black")
-#points(seq.div[101:1001], prediction1.2.CI$lwr, type = 'l', lty = "dashed", lwd = 0.5, col = "black")
 dev.off()
 
 
@@ -213,8 +150,10 @@ options(na.action = "na.pass")
 models.H2 <-  dredge(global.model.H2, beta = "none", evaluate = TRUE, rank = AICc, extra = "adjR^2")
 options(na.action = "na.omit")
 
+## comparing models ----
 model.sel(models.H2)
 
+## all models table ----
 models.H2.table <- as.data.frame(model.sel(models.H2))
 models.H2.table$ID <- rownames(models.H2.table)
 models.H2.table <- models.H2.table[c(ncol(models.H2.table), 1:(ncol(models.H2.table) - 1))]
@@ -222,18 +161,17 @@ colnames(models.H2.table) <-
   c("ID","Intercept","E-046","J-078","J-088","J-059","J-043","J-067",
     "J-048","J-076","E-045","J-092","E-005","J-068","adj.R2","df","LL","AICc","ΔAICc","weight")
 
-# Output for Appendix 2
+# table output for Appendix 2
 write.csv2(models.H2.table, file = "data/models.H2.csv", row.names = F)
 # Convert to pdf afterwards on local computer
 
 ## averaging ----
-# not used, but just for modeling exploration
+# not used in article, but done just for data exploration
 modH2.avg <- model.avg(models.H2, subset = delta <= 2, fit = T,  data = data_lb.d.c)
-
 summary(modH2.avg)
 
 # extract coefficients of models with delta AICc < 2 
-# To build table for article
+# to build table for article
 # first model from exploration
 modH2.D1 <- lm(leaf_biom ~ F + I + J, data = data_lb.d.c)
 summary(modH2.D1)
@@ -244,7 +182,7 @@ summary(lm(leaf_biom ~ F + H + I + J, data = data_lb.d.c))
 summary(lm(leaf_biom ~ C + F + I + J, data = data_lb.d.c))
 summary(lm(leaf_biom ~ B + F + I + J, data = data_lb.d.c))
 
-## postulates ----
+## postulates verification ----
 
 # prep : make dataframe and calculate residuals for modH2.D1
 df.prH2.D1 <- expand.grid(F = c(0,1),I = c(0,1),J = c(0,1))
@@ -260,7 +198,7 @@ data_resH2.D1 <- subset(data_resH2.D1, select = -5)
 data_resH2.D1$residuals <- data_resH2.D1$leaf_biom-data_resH2.D1$predicted
 data_resH2.D1$residuals.st <- scale(data_resH2.D1$residuals, center = T, scale = T)
 
-### Figure residuals ~ predicted ----
+### Appendix 1: Figure S2; residuals ~ predicted ----
 tiff(filename = "./figures/modH2.D1_res-pred_and_QQplot.tiff", width = 6, height = 3, units = "in", pointsize = 7.5, res=300)
 par(mfrow=c(1,2), mar=c(5, 4, 1, 2))
 plot(residuals.st ~ predicted, data = data_resH2.D1,
@@ -274,10 +212,10 @@ qqnorm(data_resH2.D1$residuals, main=NULL,
 qqline(data_resH2.D1$residuals)
 dev.off()
 
-## statisticalconclusion ----
+## statistical conclusion ----
 # F and J have a positive effect on leaf biomass, while I has a negative effect
 
-## Figure ----
+## Figure 2 ----
 
 # Create a new dataframe with a column to represent different combinations of F, I, and J
 biom_data.fig2 <- biom_data
@@ -321,7 +259,6 @@ legend_order <- c(
 
 # Plot with different colors for each combination
 ggplot(biom_data.fig2, aes(x = comm, y = leaf_biom, fill = combination)) +
-  #stat_boxplot(geom = 'errorbar') +
   geom_line() +
   geom_point(shape=21, size=3) +
   geom_vline(xintercept = 13.5, color = "gray60", linetype = "dotted", size = 0.5) +
@@ -360,8 +297,10 @@ options(na.action = "na.pass")
 models.H3 <-  dredge(global.model.H3, beta = "none", evaluate = TRUE, rank = AICc, extra = "adjR^2")
 options(na.action = "na.omit")
 
+## comparing models ----
 model.sel(models.H3)
 
+## all models table ----
 models.H3.table <- as.data.frame(model.sel(models.H3))
 models.H3.table$ID <- rownames(models.H3.table)
 models.H3.table <- models.H3.table[c(ncol(models.H3.table), 1:(ncol(models.H3.table) - 1))]
@@ -370,7 +309,7 @@ colnames(models.H3.table) <-
 "E-045:D2","J-092:D2","J-067:E-045:J-092","J-067:E-045:D2","J-067:J-092:D2",
 "E-045:J-092:D2","J-067:E-045:J-092:D2","adj.R2","df","LL","AICc","ΔAICc","weight")
 
-# Output for Appendix 2
+# Output for Appendix 3
 write.csv2(models.H3.table, file = "data/models.H3.csv", row.names = F)
 # Convert to pdf afterwards on local computer
 
@@ -401,7 +340,7 @@ data_resH3 <- subset(data_resH3, select = -6)
 data_resH3$residuals <- data_resH3$leaf_biom-data_resH3$predicted
 data_resH3$residuals.st <- scale(data_resH3$residuals, center = T, scale = T)
 
-### residuals ~ predicted ----
+### Appendix 1: Figure S3; residuals ~ predicted ----
 tiff(filename = "./figures/modH3_res-pred_and_QQplot.tiff", width = 6, height = 3, units = "in", pointsize = 7.5, res=300)
 par(mfrow=c(1,2), mar=c(5, 4, 1, 2))
 plot(residuals.st ~ predicted, data = data_resH3,
@@ -417,6 +356,7 @@ dev.off()
 
 
 ## EMM  ----
+
 # Data exploration 
 par(mfrow=c(1,2))
 seq.div <- with(data_lb.d.c, seq(from = 0, to = max(diversity), by = 0.01))
@@ -431,7 +371,6 @@ summary(em6)
 
 # reference figure (for attesting validity of next hand-made figure with 8 panels)
 emmip(modH3,  F * I * J ~ poly(diversity,2,raw=TRUE), data = data_lb.d.c, type = "response",  at = list(diversity = seq.div))
-
 
 ## predicted values of modH3 ----
 
@@ -450,7 +389,7 @@ LCI_F1.I0.J1 <- filter(modH3.FCI, F == 1 & I == 0 & J == 1)
 LCI_F0.I1.J1 <- filter(modH3.FCI, F == 0 & I == 1 & J == 1) 
 LCI_F1.I1.J1 <- filter(modH3.FCI, F == 1 & I == 1 & J == 1)
 
-## Figure, 8 PANELS ----
+## Figure 3, with 8 panels ----
 tiff(filename = "./figures/biomass_by_strainXrichness-panels.tiff", width = 9, height = 9, units = "in", pointsize = 5.75, res=300)
 par(mfrow=c(3,3), mar=c(4.1, 4.1, 0.1, 0.1), xpd=TRUE, font.lab = 2, cex = 1.3, cex.axis = 1.3) # margins order : bottom, left, top and right
 
@@ -472,8 +411,6 @@ points(filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$diversity, filter(data_lb.d
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 1 & I == 0 & J == 0)$diversity, filter(data_lb.d.c, F == 1 & I == 0 & J == 0)$leaf_biom, col = "forestgreen", pch = 16, cex=1.5)
 points(seq.div[101:801], LCI_F1.I0.J0$yvar[101:801], type = 'l', lty = "solid", lwd = 2, col = "forestgreen")
-#points(seq.div[101:801], LCI_F1.I0.J0$LCL[101:801], type = 'l', lty = "dotted",  lwd = 1.25, col = "forestgreen")
-#points(seq.div[101:801], LCI_F1.I0.J0$UCL[101:801], type = 'l', lty = "dotted",  lwd = 1.25, col = "forestgreen")
 legend(x = "topleft", inset=c(0,0), legend = "J-067", bty = "n", cex = 1.2)
 
 # F0-I1-J0
@@ -494,8 +431,6 @@ points(filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$diversity, filter(data_lb.d
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 0 & I == 1 & J == 0)$diversity, filter(data_lb.d.c, F == 0 & I == 1 & J == 0)$leaf_biom, col = "forestgreen", pch = 16, cex=1.5)
 points(seq.div[101:601], LCI_F0.I1.J0$yvar[101:601], type = 'l', lty = "solid", lwd = 2, col = "forestgreen")
-#points(seq.div[101:601], LCI_F0.I1.J0$LCL[101:601], type = 'l', lty = "dotted", lwd = 1.25, col = "forestgreen")
-#points(seq.div[101:601], LCI_F0.I1.J0$UCL[101:601], type = 'l', lty = "dotted", lwd = 1.25, col = "forestgreen")
 legend(x = "topleft", inset=c(0,0), legend = "E-045", bty = "n", cex = 1.2)
 
 # F0-I0-J1
@@ -516,8 +451,6 @@ points(filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$diversity, filter(data_lb.d
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 0 & I == 0 & J == 1)$diversity, filter(data_lb.d.c, F == 0 & I == 0 & J == 1)$leaf_biom, col = "forestgreen", pch = 16, cex=1.5)
 points(seq.div[101:601], LCI_F0.I0.J1$yvar[101:601], type = 'l', lty = "solid", lwd = 2, col = "forestgreen")
-#points(seq.div[101:601], LCI_F0.I0.J1$LCL[101:601], type = 'l', lty = "dotted", lwd = 1.25, col = "forestgreen")
-#points(seq.div[101:601], LCI_F0.I0.J1$UCL[101:601], type = 'l', lty = "dotted", lwd = 1.25, col = "forestgreen")
 legend(x = "topleft", inset=c(0,0), legend = "J-092", bty = "n", cex = 1.2)
 
 # F1-I1-J0
@@ -538,8 +471,6 @@ points(filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$diversity, filter(data_lb.d
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 0)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 0)$leaf_biom, col = "forestgreen", pch = 16, cex=1.5)
 points(seq.div[201:1001], LCI_F1.I1.J0$yvar[201:1001], type = 'l', lty = "solid", lwd = 2, col = "forestgreen")
-#points(seq.div[201:1001], LCI_F1.I1.J0$LCL[201:1001], type = 'l', lty = "dotted", lwd = 1.25, col = "forestgreen")
-#points(seq.div[201:1001], LCI_F1.I1.J0$UCL[201:1001], type = 'l', lty = "dotted", lwd = 1.25, col = "forestgreen")
 legend(x = "topleft", inset=c(0,0), legend = "J-067 & E-045", bty = "n", cex = 1.2)
 
 # F1-I0-J1
@@ -560,8 +491,6 @@ points(filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$diversity, filter(data_lb.d
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 1 & I == 0 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 0 & J == 1)$leaf_biom, col = "forestgreen", pch = 16, cex=1.5)
 points(seq.div[801:1001], LCI_F1.I0.J1$yvar[801:1001], type = 'l', lty = "solid", lwd = 2, col = "forestgreen")
-#points(seq.div[801:1001], LCI_F1.I0.J1$LCL[801:1001], type = 'l', lty = "dotted", lwd = 1.25, col = "forestgreen")
-#points(seq.div[801:1001], LCI_F1.I0.J1$UCL[801:1001], type = 'l', lty = "dotted", lwd = 1.25, col = "forestgreen")
 legend(x = "topleft", inset=c(0,0), legend = "J-067 & J-092", bty = "n", cex = 1.2)
 
 # F0-I1-J1
@@ -582,8 +511,6 @@ points(filter(data_lb.d.c, F == 1 & I == 0 & J == 1)$diversity, filter(data_lb.d
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$leaf_biom, col = "forestgreen", pch = 16, cex=1.5)
 points(seq.div[401:1001], LCI_F0.I1.J1$yvar[401:1001], type = 'l', lty = "solid", lwd = 2, col = "forestgreen")
-#points(seq.div[401:1001], LCI_F0.I1.J1$LCL[401:1001], type = 'l', lty = "dotted", lwd = 1.25, col = "forestgreen")
-#points(seq.div[401:1001], LCI_F0.I1.J1$UCL[401:1001], type = 'l', lty = "dotted", lwd = 1.25, col = "forestgreen")
 legend(x = "topleft", inset=c(0,0), legend = "E-045 & J-092", bty = "n", cex = 1.2)
 
 # F0-IO-J0
@@ -604,8 +531,6 @@ points(filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$diversity, filter(data_lb.d
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 0 & I == 0 & J == 0)$diversity, filter(data_lb.d.c, F == 0 & I == 0 & J == 0)$leaf_biom, col = "forestgreen", pch = 16, cex=1.5)
 points(seq.div[101:401], LCI_F0.I0.J0$yvar[101:401], type = 'l', lty = "solid", lwd = 2, col = "forestgreen")
-#points(seq.div[101:401], LCI_F0.I0.J0$LCL[101:401], type = 'l', lty = "dotted", lwd = 1.25, col = "forestgreen")
-#points(seq.div[101:401], LCI_F0.I0.J0$UCL[101:401], type = 'l', lty = "dotted", lwd = 1.25, col = "forestgreen")
 legend(x = "topleft", inset=c(0,0), legend = "Other strains only", bty = "n", cex = 1.2)
 
 # F0-I1-J1
@@ -626,15 +551,13 @@ points(filter(data_lb.d.c, F == 1 & I == 0 & J == 1)$diversity, filter(data_lb.d
 points(filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$leaf_biom, col = "forestgreen", pch = 16, cex=1.5)
 points(seq.div[601:1001], LCI_F1.I1.J1$yvar[601:1001], type = 'l', lty = "solid", lwd = 2, col = "forestgreen")
-#points(seq.div[601:1001], LCI_F1.I1.J1$LCL[601:1001], type = 'l', lty = "dotted", lwd = 1.25, col = "forestgreen")
-#points(seq.div[601:1001], LCI_F1.I1.J1$UCL[601:1001], type = 'l', lty = "dotted", lwd = 1.25, col = "forestgreen")
 legend(x = "topleft", inset=c(0,0), legend = "J-067, E-045 & J-092", bty = "n", cex = 1.2)
 
 dev.off()
-### figure end
+### figure 3 end
 
 
-## Figure, ALL TOGETHER TO HELP PERSONAL INTERPRETATION ----
+## Extra figure (not in article); all strains together to help interpretation ----
 tiff(filename = "./figures/biomass_by_strainXrichness-all.tiff", width = 8.5, height = 5, units = "in", pointsize = 6.5, res=300)
 par(mfrow=c(1,1), mar=c(4.1, 4.1, 1.1, 16.1), xpd=TRUE, font.lab = 2, cex = 1.3, cex.axis = 1.3) # margins order : bottom, left, top and right
 plot(leaf_biom ~ diversity, data = data_lb.d.c, type = "n",
@@ -698,14 +621,14 @@ legend(x = "topright",
        horiz = FALSE, 
        title = NULL)
 dev.off()
-#figure end
+# extra figure end
 
 
 ###############################################################################-
 
 # Complimentarity vs selection ----
 
-## rearrange new data frames ----
+## create and rearrange new dataframes ----
 data.CS <- data_lb.d.c
 data.CS <- data.CS[,-c(4:20)]
 synthcomms.CS <- synthcomms_PA
@@ -748,16 +671,11 @@ synthcomms.CS4 <- synthcomms.CS2
 
 ###############################################################################-
 
-## Figure - framework curves for figure in Appendix 1 ----
+## Appendix 1: Figure S4; - framework curves ----
 
 x <- seq(0, 10, length.out = 1000)
 y <- log10(3*x + 1) / log10(25)
 y0 <- seq(0, 0, length.out = 1000)
-
-# Plot the curve
-plot(x, y, type = "l", lwd = 2, col = "blue", xlab = "X", ylab = "Y",
-     main = "Logarithmic Curve from (0,0) to (10,1)")
-
 
 tiff(filename = "./figures/comp_vs_selection_framework.tiff", width = 6, height = 5, units = "in", pointsize = 7, res=300)
 par(mfrow=c(1,1), mar=c(4.1, 4.1, 1.1, 1.1), font.lab = 2, cex = 1.3, cex.axis = 1.3)
@@ -779,14 +697,15 @@ text(5.5, 0.5, "indistinct \n positive NBE", cex = 1.3)
 text(5.5, -0.5, "indistinct \n negative NBE", cex = 1.3)
 dev.off()
 
+
 ###############################################################################-
 
 
-## Predictions and models ----
+## Alternative models ----
 
-### Predictions ----
+### Predicted values ----
 
-# Calculate the predicted means of communities, based on the mean of their strains in monoculture
+# Calculate the predicted means of communities, based on the mean of their strains in monocultures
 synthcomms.CS2$pred_avg <- rowMeans(synthcomms.CS2[,c(1:12)], na.rm = T)
 
 # Determine the predicted max value of communities, based on the highest mean value of one of its strain in monoculture
@@ -799,7 +718,7 @@ row_min <- apply(synthcomms.CS4, 1, min, na.rm = T)
 synthcomms.CS2$pred_min <- row_min
 rm(synthcomms.CS4)
 
-### Data frame for analyses ---- 
+### New dataframe for analyses ---- 
 data.CS2 <- cbind(data.CS, pred_avg=synthcomms.CS2$pred_avg, pred_max=synthcomms.CS2$pred_max, pred_min=synthcomms.CS2$pred_min)
 
 ### Models ----
@@ -812,6 +731,7 @@ model.sel(lm1.0, lm1.1, lm1.2)
 # Polynomial regression (lm1.2) is the best model
 mod_pos.sel <- lm1.2
 summary(mod_pos.sel)
+# model predictions
 seq.div <- with(data.CS2, seq(from = 0, to = 10, by = 0.01))
 prediction.mod_pos.sel <- data.frame(predict(mod_pos.sel, newdata=data.frame(diversity=seq.div[101:1001]),
                                          interval = "confidence", level = 0.95))
@@ -821,10 +741,11 @@ lm2.0 <- lm(pred_avg ~ 1, data = data.CS2)
 lm2.1 <- lm(pred_avg ~ diversity, data = data.CS2)
 lm2.2 <- lm(pred_avg ~ poly(diversity,2,raw=TRUE), data = data.CS2)
 model.sel(lm2.0, lm2.1, lm2.2)
-# Null model (lm2.0) is marginal a better model than lm2.1, but we'll use lm2.1 since it is more representative
-# of the alternative model we want to use
+# Null model (lm2.0) is marginal a better model than lm2.1, but we'll use lm2.1 
+# since it is more representative of the alternative model we want to use
 mod_no.div.fx <- lm2.1
 summary(mod_no.div.fx)
+# model predictions
 prediction.mod_no.div.fx <- data.frame(predict(mod_no.div.fx, newdata=data.frame(diversity=seq.div[101:1001]),
                                          interval = "confidence", level = 0.95))
 
@@ -836,11 +757,13 @@ model.sel(lm3.0, lm3.1, lm3.2)
 # Polynomial regression (lm3.2) is the best model
 mod_neg.sel <- lm3.2
 summary(mod_neg.sel)
+# model predictions
 prediction.mod_neg.sel <- data.frame(predict(mod_neg.sel, newdata=data.frame(diversity=seq.div[101:1001]),
                                          interval = "confidence", level = 0.95))
 
 ### observed data model : Model H1.2 (polynomial) ----
 mod_obs <- lm(leaf_biom ~ poly(diversity,2,raw=TRUE), data = data.CS2)
+# model predictions
 prediction.mod_obs <- data.frame(predict(mod_obs, newdata=data.frame(diversity=seq.div[101:1001]),
                                        interval = "confidence", level = 0.95))
 
@@ -849,10 +772,9 @@ prediction.mod_obs <- data.frame(predict(mod_obs, newdata=data.frame(diversity=s
 
 ## Figures ----
 
-### 4 Models panels ----
+### Appendix 1: Figure S5; panels of the four models ----
 
 tiff(filename = "./figures/alternative_and_obs_models.tiff", width = 6, height = 6, units = "in", pointsize = 4, res=300)
-
 par(mfrow=c(2,2), mar=c(4.1, 4.1, 1.1, 1.1), font.lab = 2, cex = 1.3, cex.axis = 1.3) # margins order : bottom, left, top and right
 
 plot(pred_avg ~ diversity, data = data.CS2,
@@ -864,8 +786,6 @@ plot(pred_avg ~ diversity, data = data.CS2,
 polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction.mod_no.div.fx$upr, rev(prediction.mod_no.div.fx$lwr)), col = rgb(0,0,1,0.2), border = NA)
 points(filter(biom_data, diversity == 0)$diversity, filter(biom_data, diversity == 0)$leaf_biom, col = "black", pch = 4, cex=0.8)
 points(seq.div[101:1001], prediction.mod_no.div.fx$fit, type = 'l', lty = "solid", lwd = 1, col = "blue")
-#points(seq.div[101:1001], prediction.mod_no.div.fx$upr, type = 'l', lty = "dotted", lwd = 1, col = "blue")
-#points(seq.div[101:1001], prediction.mod_no.div.fx$lwr, type = 'l', lty = "dotted", lwd = 1, col = "blue")
 text(0, 64, "a", cex=1.8)
 
 plot(pred_max ~ diversity, data = data.CS2,
@@ -877,8 +797,6 @@ plot(pred_max ~ diversity, data = data.CS2,
 polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction.mod_pos.sel$upr, rev(prediction.mod_pos.sel$lwr)), col = rgb(1,0,0,0.2), border = NA)
 points(filter(biom_data, diversity == 0)$diversity, filter(biom_data, diversity == 0)$leaf_biom, col = "black", pch = 4, cex=0.8)
 points(seq.div[101:1001], prediction.mod_pos.sel$fit, type = 'l', lty = "solid", lwd = 1, col = "red")
-#points(seq.div[101:1001], prediction.mod_pos.sel$upr, type = 'l', lty = "dotted", lwd = 1, col = "red")
-#points(seq.div[101:1001], prediction.mod_pos.sel$lwr, type = 'l', lty = "dotted", lwd = 1, col = "red")
 text(0, 64, "b", cex=1.8)
 
 plot(pred_min ~ diversity, data = data.CS2,
@@ -890,8 +808,6 @@ plot(pred_min ~ diversity, data = data.CS2,
 polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction.mod_neg.sel$upr, rev(prediction.mod_neg.sel$lwr)), col = rgb(1,0.8,0,0.3), border = NA)
 points(filter(biom_data, diversity == 0)$diversity, filter(biom_data, diversity == 0)$leaf_biom, col = "black", pch = 4, cex=0.8)
 points(seq.div[101:1001], prediction.mod_neg.sel$fit, type = 'l', lty = "solid", lwd = 1, col = "orange")
-#points(seq.div[101:1001], prediction.mod_neg.sel$upr, type = 'l', lty = "dotted", lwd = 1, col = "orange")
-#points(seq.div[101:1001], prediction.mod_neg.sel$lwr, type = 'l', lty = "dotted", lwd = 1, col = "orange")
 text(0, 64, "c", cex=1.8)
 
 plot(leaf_biom ~ diversity, data = data.CS2,
@@ -903,42 +819,13 @@ plot(leaf_biom ~ diversity, data = data.CS2,
 polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction.mod_obs$upr, rev(prediction.mod_obs$lwr)), col = rgb(0.2,0.2,0.2,0.2), border = NA)
 points(filter(biom_data, diversity == 0)$diversity, filter(biom_data, diversity == 0)$leaf_biom, col = "black", pch = 4, cex=0.8)
 points(seq.div[101:1001], prediction.mod_obs$fit, type = 'l', lty = "solid", lwd = 1, col = "black")
-#points(seq.div[101:1001], prediction.mod_obs$upr, type = 'l', lty = "dotted", lwd = 1, col = "black")
-#points(seq.div[101:1001], prediction.mod_obs$lwr, type = 'l', lty = "dotted", lwd = 1, col = "black")
 text(0, 64, "d", cex=1.8)
 
 dev.off()
+# figure S5 end
 
 
-### Observed data with all 4 models predictions ----
-
-# version 1
-
-tiff(filename = "./figures/comp_vs_select_predictions.tiff", width = 6, height = 5, units = "in", pointsize = 9, res=300)
-par(mfrow=c(1,1), mar=c(4.1, 4.1, 1.1, 1.1), font.lab = 2, cex = 1.3, cex.axis = 1.3) # margins order : bottom, left, top and right
-plot(leaf_biom ~ diversity, data = data.CS2,
-     pch = 1, cex = 1, col = "black", cex.lab = 1.3,
-     xlab = "Strain richness",
-     ylab = "Dry leaf biomass (mg)",
-     ylim = c(0, 65),
-     xlim = c(-0.25,10.5))
-points(filter(biom_data, diversity == 0)$diversity, filter(biom_data, diversity == 0)$leaf_biom, col = "black", pch = 4, cex=0.8)
-points(seq.div[101:1001], prediction.mod_no.div.fx$fit, type = 'l', lty = "solid", lwd = 2, col = "blue")
-points(seq.div[101:1001], prediction.mod_no.div.fx$upr, type = 'l', lty = "dotted", lwd = 2, col = "blue")
-points(seq.div[101:1001], prediction.mod_no.div.fx$lwr, type = 'l', lty = "dotted", lwd = 2, col = "blue")
-points(seq.div[101:1001], prediction.mod_pos.sel$fit, type = 'l', lty = "solid", lwd = 2, col = "red")
-points(seq.div[101:1001], prediction.mod_pos.sel$upr, type = 'l', lty = "dotted", lwd = 2, col = "red")
-points(seq.div[101:1001], prediction.mod_pos.sel$lwr, type = 'l', lty = "dotted", lwd = 2, col = "red")
-points(seq.div[101:1001], prediction.mod_neg.sel$fit, type = 'l', lty = "solid", lwd = 2, col = "orange")
-points(seq.div[101:1001], prediction.mod_neg.sel$upr, type = 'l', lty = "dotted", lwd = 2, col = "orange")
-points(seq.div[101:1001], prediction.mod_neg.sel$lwr, type = 'l', lty = "dotted", lwd = 2, col = "orange")
-points(seq.div[101:1001], prediction.mod_obs$fit, type = 'l', lty = "solid", lwd = 2, col = "black")
-points(seq.div[101:1001], prediction.mod_obs$upr, type = 'l', lty = "dotted", lwd = 2, col = "black")
-points(seq.div[101:1001], prediction.mod_obs$lwr, type = 'l', lty = "dotted", lwd = 2, col = "black")
-dev.off()
-
-
-# version 2 (with shaded CI)
+### Figure 4 - Observed data with all 4 models predictions ----
 
 tiff(filename = "./figures/comp_vs_select_predictions.tiff", width = 6, height = 5, units = "in", pointsize = 9, res=300)
 par(mfrow=c(1,1), mar=c(4.1, 4.1, 1.1, 1.1), font.lab = 2, cex = 1.3, cex.axis = 1.3) # margins order : bottom, left, top and right
@@ -961,58 +848,4 @@ points(seq.div[101:1001], prediction.mod_obs$fit, type = 'l', lty = "solid", lwd
 dev.off()
 
 
-### Residuals check ----
-
-## Calculate avg and max models residuals
-# difference between observed data and predicted (avg and max) data
-# and make a data frame
-models.residuals <- data.frame(diversity = data.CS2$diversity, obs_mod_res = residuals(mod_obs), avg_mod_res = data.CS2$leaf_biom-data.CS2$pred_avg, max_mod_res = data.CS2$leaf_biom-data.CS2$pred_max)
-
-## Models
-
-## Average model residuals
-mod_res_avg.1 <- lm(avg_mod_res ~ diversity, data = models.residuals)
-mod_res_avg.2 <- lm(avg_mod_res ~ poly(diversity,2,raw=TRUE), data = models.residuals)
-model.sel(mod_res_avg.1,mod_res_avg.2)
-
-## Max model residuals
-mod_res_max.1 <- lm(max_mod_res ~ diversity, data = models.residuals)
-mod_res_max.2 <- lm(max_mod_res ~ poly(diversity,2,raw=TRUE), data = models.residuals)
-model.sel(mod_res_max.1,mod_res_max.2)
-
-
-## Figure
-
-tiff(filename = "./figures/residuals_avg_max_obs.tiff", width = 6, height = 2, units = "in", pointsize = 4, res=300)
-par(mfrow=c(1,3), mar=c(4.1, 4.1, 1.1, 1.1), font.lab = 2, cex = 1.3, cex.axis = 1.3)
-plot(1, type="n", data = models.residuals,
-     pch = 5, cex = 1, col = "blue", cex.lab = 1.3,
-     xlab = "",
-     ylab = "Average model residuals",
-     ylim = c(-30,30),
-     xlim = c(-0.25,10.5))
-abline(0,0, col="grey")
-points(models.residuals$diversity, models.residuals$avg_mod_res, pch = 5, cex = 1, col = "blue")
-plot(1, type="n", data = models.residuals,
-     pch = 2, cex = 1, col = "red", cex.lab = 1.3,
-     xlab = "Strain richness",
-     ylab = "Maximum model residuals",
-     ylim = c(-30,30),
-     xlim = c(-0.25,10.5))
-abline(0,0, col="grey")
-points(models.residuals$diversity, models.residuals$max_mod_res, pch = 2, cex = 1, col = "red")
-plot(1, type="n", data = models.residuals,
-     pch = 1, cex = 1, col = "black", cex.lab = 1.3,
-     xlab = "",
-     ylab = "Observed data model residuals",
-     ylim = c(-30,30),
-     xlim = c(-0.25,10.5))
-abline(0,0, col="grey")
-points(models.residuals$diversity, models.residuals$obs_mod_res, pch = 1, cex = 1, col = "black")
-dev.off()
-
-
 ### SCRIPT END ###
-
-
-###############################################################################-
