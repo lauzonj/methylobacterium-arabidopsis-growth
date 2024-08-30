@@ -20,7 +20,7 @@ shelf_y : position coordinates on shelves in growth chamber
 
 ### arabi_synthcomms.csv
 
-A to L : proportion (relative abundance) of each strain in the community associated with a plant.
+A to L : each letter represents a Methylobacterium strain (see section below). In this dataframe, values are the proportion (relative abundance) of each corresponding strain in the community associated with a plant.
 
 clades : phylogenetic clades of Methylobacterium strains (letters A, B, and D are unrelated to letters assigned to strains)
 
