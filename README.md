@@ -22,7 +22,8 @@ shelf_y : position coordinates on shelves in growth chamber
 
 A to L : each letter represents a Methylobacterium strain (see section below). In this dataframe, values are the proportion (relative abundance) of each corresponding strain in the community associated with a plant.
 
-clades : phylogenetic clades of Methylobacterium strains (letters A, B, and D are unrelated to letters assigned to strains)
+clades : phylogenetic clades of Methylobacterium strains (letters A, B, and D are unrelated to letters assigned to strains). These clades are based on this paper: 
+Leducq, J. B., Sneddon, D., Santos, M., Condrain-Morel, D., Bourret, G., Martinez-Gomez, N. C., ... & Marx, C. J. (2022). Comprehensive phylogenomics of Methylobacterium reveals four evolutionary distinct groups and underappreciated phyllosphere diversity. Genome Biology and Evolution, 14(8), evac123.
 
 ## Methylobacterium strains
 
