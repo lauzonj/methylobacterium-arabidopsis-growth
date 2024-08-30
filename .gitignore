@@ -50,3 +50,6 @@ rsconnect/
 
 # Figures
 figures/*
+
+# CSV files
+*.csv
