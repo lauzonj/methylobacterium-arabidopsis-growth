@@ -162,8 +162,7 @@ colnames(models.H2.table) <-
     "J-048","J-076","E-045","J-092","E-005","J-068","adj.R2","df","LL","AICc","ΔAICc","weight")
 
 # table output for Appendix 2
-# write.csv2(models.H2.table, file = "data/models.H2.csv", row.names = F)
-# Convert to pdf afterwards on local computer
+write.csv2(models.H2.table, file = "data/models.H2.csv", row.names = F)
 
 ## averaging ----
 # not used in article, but done just for data exploration
@@ -310,8 +309,7 @@ colnames(models.H3.table) <-
 "E-045:J-092:D2","J-067:E-045:J-092:D2","adj.R2","df","LL","AICc","ΔAICc","weight")
 
 # Output for Appendix 3
-# write.csv2(models.H3.table, file = "data/models.H3.csv", row.names = F)
-# Convert to pdf afterwards on local computer
+write.csv2(models.H3.table, file = "data/models.H3.csv", row.names = F)
 
 ## averaging ----
 modH3 <- model.avg(models.H3, subset = delta <= 2, fit = T,  data = data_lb.d.c)
