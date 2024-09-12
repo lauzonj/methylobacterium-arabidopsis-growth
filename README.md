@@ -25,11 +25,11 @@ A to L : each letter represents a Methylobacterium strain (see section below). I
 clades : phylogenetic clades of Methylobacterium strains (letters A, B, and D are unrelated to letters assigned to strains). These clades are based on this paper: 
 Leducq, J. B., Sneddon, D., Santos, M., Condrain-Morel, D., Bourret, G., Martinez-Gomez, N. C., ... & Marx, C. J. (2022). Comprehensive phylogenomics of Methylobacterium reveals four evolutionary distinct groups and underappreciated phyllosphere diversity. Genome Biology and Evolution, 14(8), evac123.
 
-### H2_model_exploration.csv
+### H2_all_models.csv
 
 Parameters and statistical results for all models explored (n = 4096) in the context of our second hypothesis, based on the saturated model: dry leaf biomass ~ E-046 + J-078 + J-088 + J-059 + J-043 + J-067 + J-048 + J-076 + E-045 + J-092 + E-005 + J-068. Intercept indicates the mean biomass of samples when all strains included in the corresponding model are absent. ID: model number; +: parameters considered in the corresponding model; adj.R2: adjusted R2; df: degrees of freedom; LL: log-likelihood.
 
-### H3_model_exploration.csv
+### H3_all_models.csv
 
 Parameters and statistical results for all models explored (n = 167) in the context of our third hypothesis, based on the saturated model: dry leaf biomass ~ strain richness + J-067 + E-045 + J-092 + strain richness:J-067 + strain richness:E-045 + strain richness:J-092 + J-067:E-045 + J-067:J-092 + E-045:J-092 + strain richness:J-067:E-045 + strain richness:J-067:J-092 + strain richness:E-045:J-092 + J-067:E-045:J-092 + strain richness:J-067:E-045:J-092. Intercept indicates the mean biomass of one-strain samples that do not contain the strains included in the corresponding model. ID: model number; D2: polynomial strain richness; +: parameters considered in the corresponding model; adj.R2: adjusted R2; df: degrees of freedom; LL: log-likelihood.
 
