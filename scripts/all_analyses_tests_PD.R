@@ -139,6 +139,77 @@ dev.off()
 
 ###############################################################################-
 
+# H1.2 - GROWTH ~ PHYLOGENETIC DIVERSITY ---- 
+
+# Hypothesis 1.2
+
+## import phylogenetic tree ----
+library(picante)
+meth.tree <- read.tree("data/RAxML_bipartitionsBranchLabels.Partition-Concatenated-genes-nov21-b=500-rooted")
+
+# rename tips of the tree
+# prepare data
+strains.list <- read.csv2("data/List-genomes.csv", sep = ";", dec = ".")
+st.sp <- strains.list[,c(1,2,4)]
+colnames(st.sp) <- c("st","strain","Meth_species")
+tip.labels <- data.frame(meth.tree[["tip.label"]])
+colnames(tip.labels) <- "st"
+st.sp <- st.sp[st.sp$st %in% tip.labels$st,]
+tip.labels$st <- factor(tip.labels$st, levels = unique(tip.labels$st))
+st.sp$st <- factor(st.sp$st, levels = unique(tip.labels$st))
+st.sp <- st.sp[order(st.sp$st), ]
+rownames(st.sp) <- seq_len(nrow(st.sp))
+tip.labels <- cbind(tip.labels, st.sp$strain, st.sp$Meth_species)
+colnames(tip.labels) <- c("st","strain","Meth_species")
+# rename tree's tip labels with strain's names
+meth.tree[["tip.label"]] <- tip.labels$strain
+meth.tree[["tip.label"]]
+
+
+# plot tree
+plot(meth.tree, show.tip.label = T)
+library(ggtree)
+ggtree(meth.tree) + 
+  theme_tree() +
+  geom_tiplab(size=2)
+
+# calculate phylogenetic distance matrix
+phy.dist <- cophenetic(meth.tree)
+
+# edit synthcomm matrix (columns shall be strain names)
+synthcomms_PA.st <- synthcomms_PA
+colnames(synthcomms_PA.st) <- c("E-046","J-078","J-088","J-059","J-043","J-067","J-048","J-076","E-045","J-092","E-005","J-068")
+
+# calculate mpd
+mpd.res <- mpd(synthcomms_PA.st, phy.dist, abundance.weighted = F)
+data_lb.d.mpd <- cbind(data_lb.d, mpd.res)
+
+# plot biomass ~ mpd
+plot(data_lb.d.mpd$leaf_biom ~ data_lb.d.mpd$mpd.res)
+
+# calculate ses.mpd
+ses.mpd.res <- ses.mpd(synthcomms_PA.st, phy.dist, null.model = "taxa.labels", abundance.weighted = FALSE, runs = 999, iterations = 1000)
+data_lb.d.mpd <- cbind(data_lb.d.mpd, ses.mpd.res)
+
+# plot biomass ~ ses.mpd
+plot(data_lb.d.mpd$leaf_biom ~ data_lb.d.mpd$mpd.obs.z)
+# linear model
+lm.ses.mpd <- lm(leaf_biom ~ mpd.obs.z, data_lb.d.mpd)
+summary(lm.ses.mpd)
+hist(residuals(lm.ses.mpd), breaks = 50)
+shapiro.test(residuals(lm.ses.mpd))
+plot(lm.ses.mpd)
+
+# calculate ses.mntd
+ses.mntd.res <- ses.mntd(synthcomms_PA.st, phy.dist, null.model = "taxa.labels", abundance.weighted = FALSE, runs = 999, iterations = 1000)
+data_lb.d.mntd <- cbind(data_lb.d, ses.mntd.res)
+
+# plot biomass ~ ses.mntd
+plot(data_lb.d.mntd$leaf_biom ~ data_lb.d.mntd$mntd.obs.z)
+
+
+###############################################################################-
+
 
 # H2 - GROWTH ~ STRAINS P/A ----
 # Hypothesis 2
