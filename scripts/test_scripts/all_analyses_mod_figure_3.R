@@ -839,6 +839,103 @@ dev.off()
 # figure S5 end
 
 
+
+
+### FIGURE FOR PRESENTATION ----
+
+tiff(filename = "./figures/figA.tiff", width = 6, height = 6, units = "in", pointsize = 9, res=300)
+par(mfrow=c(1,1), mar=c(4.1, 4.1, 1.1, 1.1), font.lab = 2, cex = 1.3, cex.axis = 1.3) # margins order
+plot(pred_max ~ diversity, data = data.CS2,
+     pch = 2, cex = 1, col = "red", cex.lab = 1.3,
+     xlab = "Strain richness",
+     ylab = "Dry leaf biomass (mg)",
+     ylim = c(0, 65),
+     xlim = c(-0.25,10.5))
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction.mod_pos.sel$upr, rev(prediction.mod_pos.sel$lwr)), col = rgb(1,0,0,0.2), border = NA)
+points(filter(biom_data, diversity == 0)$diversity, filter(biom_data, diversity == 0)$leaf_biom, col = "black", pch = 4, cex=0.8)
+points(seq.div[101:1001], prediction.mod_pos.sel$fit, type = 'l', lty = "solid", lwd = 1, col = "red")
+dev.off()
+
+
+tiff(filename = "./figures/figB.tiff", width = 6, height = 6, units = "in", pointsize = 9, res=300)
+par(mfrow=c(1,1), mar=c(4.1, 4.1, 1.1, 1.1), font.lab = 2, cex = 1.3, cex.axis = 1.3) # margins order
+plot(pred_min ~ diversity, data = data.CS2,
+     pch = 6, cex = 1, col = "orange", cex.lab = 1.3,
+     xlab = "Strain richness",
+     ylab = "Dry leaf biomass (mg)",
+     ylim = c(0, 65),
+     xlim = c(-0.25,10.5))
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction.mod_pos.sel$upr, rev(prediction.mod_pos.sel$lwr)), col = rgb(1,0,0,0.2), border = NA)
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction.mod_neg.sel$upr, rev(prediction.mod_neg.sel$lwr)), col = rgb(1,0.8,0,0.3), border = NA)
+points(filter(biom_data, diversity == 0)$diversity, filter(biom_data, diversity == 0)$leaf_biom, col = "black", pch = 4, cex=0.8)
+points(seq.div[101:1001], prediction.mod_pos.sel$fit, type = 'l', lty = "solid", lwd = 1, col = "red")
+points(seq.div[101:1001], prediction.mod_neg.sel$fit, type = 'l', lty = "solid", lwd = 1, col = "orange")
+dev.off()
+
+
+tiff(filename = "./figures/figC.tiff", width = 6, height = 6, units = "in", pointsize = 9, res=300)
+par(mfrow=c(1,1), mar=c(4.1, 4.1, 1.1, 1.1), font.lab = 2, cex = 1.3, cex.axis = 1.3) # margins order : bottom, left, top and right
+plot(pred_avg ~ diversity, data = data.CS2,
+     pch = 5, cex = 1, col = "blue", cex.lab = 1.3,
+     xlab = "Strain richness",
+     ylab = "Dry leaf biomass (mg)",
+     ylim = c(0, 65),
+     xlim = c(-0.25,10.5))
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction.mod_pos.sel$upr, rev(prediction.mod_pos.sel$lwr)), col = rgb(1,0,0,0.2), border = NA)
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction.mod_neg.sel$upr, rev(prediction.mod_neg.sel$lwr)), col = rgb(1,0.8,0,0.3), border = NA)
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction.mod_no.div.fx$upr, rev(prediction.mod_no.div.fx$lwr)), col = rgb(0,0,1,0.2), border = NA)
+points(filter(biom_data, diversity == 0)$diversity, filter(biom_data, diversity == 0)$leaf_biom, col = "black", pch = 4, cex=0.8)
+points(seq.div[101:1001], prediction.mod_pos.sel$fit, type = 'l', lty = "solid", lwd = 1, col = "red")
+points(seq.div[101:1001], prediction.mod_neg.sel$fit, type = 'l', lty = "solid", lwd = 1, col = "orange")
+points(seq.div[101:1001], prediction.mod_no.div.fx$fit, type = 'l', lty = "solid", lwd = 1, col = "blue")
+dev.off()
+
+
+tiff(filename = "./figures/figC2.tiff", width = 6, height = 6, units = "in", pointsize = 9, res=300)
+par(mfrow=c(1,1), mar=c(4.1, 4.1, 1.1, 1.1), font.lab = 2, cex = 1.3, cex.axis = 1.3) # margins order : bottom, left, top and right
+plot(pred_avg ~ diversity, data = data.CS2,
+     pch = 5, cex = 1, col = "blue", cex.lab = 1.3,
+     xlab = "Strain richness",
+     ylab = "Dry leaf biomass (mg)",
+     ylim = c(0, 65),
+     xlim = c(-0.25,10.5),
+     type = "n")
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction.mod_pos.sel$upr, rev(prediction.mod_pos.sel$lwr)), col = rgb(1,0,0,0.2), border = NA)
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction.mod_neg.sel$upr, rev(prediction.mod_neg.sel$lwr)), col = rgb(1,0.8,0,0.3), border = NA)
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction.mod_no.div.fx$upr, rev(prediction.mod_no.div.fx$lwr)), col = rgb(0,0,1,0.2), border = NA)
+points(filter(biom_data, diversity == 0)$diversity, filter(biom_data, diversity == 0)$leaf_biom, col = "black", pch = 4, cex=0.8)
+points(seq.div[101:1001], prediction.mod_pos.sel$fit, type = 'l', lty = "solid", lwd = 1, col = "red")
+points(seq.div[101:1001], prediction.mod_neg.sel$fit, type = 'l', lty = "solid", lwd = 1, col = "orange")
+points(seq.div[101:1001], prediction.mod_no.div.fx$fit, type = 'l', lty = "solid", lwd = 1, col = "blue")
+dev.off()
+
+
+tiff(filename = "./figures/figD.tiff", width = 6, height = 6, units = "in", pointsize = 9, res=300)
+par(mfrow=c(1,1), mar=c(4.1, 4.1, 1.1, 1.1), font.lab = 2, cex = 1.3, cex.axis = 1.3) # margins order : bottom, left, top and right
+plot(leaf_biom ~ diversity, data = data.CS2,
+     pch = 1, cex = 1, col = "black", cex.lab = 1.3,
+     xlab = "Strain richness",
+     ylab = "Dry leaf biomass (mg)",
+     ylim = c(0, 65),
+     xlim = c(-0.25,10.5))
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction.mod_pos.sel$upr, rev(prediction.mod_pos.sel$lwr)), col = rgb(1,0,0,0.2), border = NA)
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction.mod_neg.sel$upr, rev(prediction.mod_neg.sel$lwr)), col = rgb(1,0.8,0,0.3), border = NA)
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction.mod_no.div.fx$upr, rev(prediction.mod_no.div.fx$lwr)), col = rgb(0,0,1,0.2), border = NA)
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction.mod_obs$upr, rev(prediction.mod_obs$lwr)), col = rgb(0.2,0.2,0.2,0.2), border = NA)
+points(filter(biom_data, diversity == 0)$diversity, filter(biom_data, diversity == 0)$leaf_biom, col = "black", pch = 4, cex=0.8)
+points(seq.div[101:1001], prediction.mod_pos.sel$fit, type = 'l', lty = "solid", lwd = 1, col = "red")
+points(seq.div[101:1001], prediction.mod_neg.sel$fit, type = 'l', lty = "solid", lwd = 1, col = "orange")
+points(seq.div[101:1001], prediction.mod_no.div.fx$fit, type = 'l', lty = "solid", lwd = 1, col = "blue")
+points(seq.div[101:1001], prediction.mod_obs$fit, type = 'l', lty = "solid", lwd = 1, col = "black")
+dev.off()
+
+
+# figure END
+
+
+
+
+
 ### Figure 4 - Observed data with all 4 models predictions ----
 
 tiff(filename = "./figures/comp_vs_select_predictions.tiff", width = 6, height = 5, units = "in", pointsize = 9, res=300)
