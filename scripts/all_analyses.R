@@ -123,11 +123,11 @@ prediction1.2.CI <- data.frame(predict(modH1.2, newdata=data.frame(diversity=seq
 prediction1.2.PI <- data.frame(predict(modH1.2, newdata=data.frame(diversity=seq.div[101:1001]), # calculated but not used
                                       interval = "prediction", level = 0.95))
 
-tiff(filename = "./figures/biomass_by_richness.tiff", width = 6, height = 5, units = "in", pointsize = 9, res=300)
+tiff(filename = "./figures/biomass_by_richness_v7.tiff", width = 6, height = 5, units = "in", pointsize = 9, res=300)
 par(mfrow=c(1,1), mar=c(4.1, 4.1, 1.1, 1.1), font.lab = 2, cex = 1.3, cex.axis = 1.3) # margins order : bottom, left, top and right
 plot(leaf_biom ~ diversity, data = data_lb.d.c,
      pch = 1, cex = 1, col = "black", cex.lab = 1.3,
-     xlab = "Strain richness",
+     xlab = "Inoculated strain richness",
      ylab = "Dry leaf biomass (mg)",
      ylim = c(5, 65),
      xlim = c(-0.25,10.5))
@@ -267,7 +267,7 @@ ggplot(biom_data.fig2, aes(x = comm, y = leaf_biom, fill = combination)) +
   geom_vline(xintercept = 43.5, color = "gray60", linetype = "dotted", size = 0.5) +
   scale_fill_manual(values = combination_colors, breaks = legend_order) +
   theme_classic() +
-  xlab("Community composition") +
+  xlab("Initial community composition") +
   ylab("Dry leaf biomass (mg)") +
   theme(text = element_text(size = 11, face = "bold")) +
   theme(axis.title.y = element_text(vjust = 3.5)) +
@@ -280,7 +280,7 @@ ggplot(biom_data.fig2, aes(x = comm, y = leaf_biom, fill = combination)) +
   annotate("text", x = 34.5, y = 60, label = "6 strains", colour = "black", size = 3.5, vjust = 0) +
   annotate("text", x = 40.5, y = 60, label = "8 strains", colour = "black", size = 3.5, vjust = 0) +
   annotate("text", x = 46.5, y = 60, label = "10 strains", colour = "black", size = 3.5, vjust = 0)
-ggsave("./figures/biomass_by_composition.tiff", path=".", width = 9, height = 5)
+ggsave("./figures/biomass_by_composition_v7.tiff", path=".", width = 9, height = 5)
 
 
 ###############################################################################-
@@ -388,7 +388,7 @@ LCI_F0.I1.J1 <- filter(modH3.FCI, F == 0 & I == 1 & J == 1)
 LCI_F1.I1.J1 <- filter(modH3.FCI, F == 1 & I == 1 & J == 1)
 
 ## Figure 3, with 8 panels ----
-tiff(filename = "./figures/biomass_by_strainXrichness-panels.tiff", width = 9, height = 9, units = "in", pointsize = 5.75, res=300)
+tiff(filename = "./figures/biomass_by_strainXrichness-panels_v7.tiff", width = 9, height = 9, units = "in", pointsize = 5.75, res=300)
 par(mfrow=c(3,3), mar=c(4.1, 4.1, 0.1, 0.1), xpd=TRUE, font.lab = 2, cex = 1.3, cex.axis = 1.3) # margins order : bottom, left, top and right
 
 # F1-IO-J0
@@ -398,6 +398,7 @@ plot(leaf_biom ~ diversity, data = data_lb.d.c, type = "n",
      ylab = "Dry leaf biomass (mg)",
      ylim = c(5, 65),
      xlim = c(-0.25,10.5))
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction1.2.CI$lwr, rev(prediction1.2.CI$upr)), col = rgb(0.2,0.2,0.2,0.2), border = NA) # fitted model
 polygon(c(seq.div[101:801], rev(seq.div[101:801])), c(LCI_F1.I0.J0$LCL[101:801], rev(LCI_F1.I0.J0$UCL[101:801])), col = rgb(0.1,1,0,0.2), border = NA)
 points(filter(biom_data, diversity == 0)$diversity, filter(biom_data, diversity == 0)$leaf_biom, col = "black", pch = 4, cex=1)
 points(filter(data_lb.d.c, F == 0 & I == 0 & J == 0)$diversity, filter(data_lb.d.c, F == 0 & I == 0 & J == 0)$leaf_biom, col = "black", pch = 1, cex=1.25)
@@ -407,6 +408,7 @@ points(filter(data_lb.d.c, F == 1 & I == 1 & J == 0)$diversity, filter(data_lb.d
 points(filter(data_lb.d.c, F == 1 & I == 0 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 0 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
+points(seq.div[101:1001], prediction1.2.CI$fit, type = 'l', lty = "solid", lwd = 2, col = "black") # fitted model
 points(filter(data_lb.d.c, F == 1 & I == 0 & J == 0)$diversity, filter(data_lb.d.c, F == 1 & I == 0 & J == 0)$leaf_biom, col = "forestgreen", pch = 16, cex=1.5)
 points(seq.div[101:801], LCI_F1.I0.J0$yvar[101:801], type = 'l', lty = "solid", lwd = 2, col = "forestgreen")
 legend(x = "topleft", inset=c(0,0), legend = "J-067", bty = "n", cex = 1.2)
@@ -418,6 +420,7 @@ plot(leaf_biom ~ diversity, data = data_lb.d.c, type = "n",
      ylab = "",
      ylim = c(5, 65),
      xlim = c(-0.25,10.5))
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction1.2.CI$lwr, rev(prediction1.2.CI$upr)), col = rgb(0.2,0.2,0.2,0.2), border = NA) # fitted model
 polygon(c(seq.div[101:601], rev(seq.div[101:601])), c(LCI_F0.I1.J0$LCL[101:601], rev(LCI_F0.I1.J0$UCL[101:601])), col = rgb(0.1,1,0,0.2), border = NA)
 points(filter(biom_data, diversity == 0)$diversity, filter(biom_data, diversity == 0)$leaf_biom, col = "black", pch = 4, cex=1)
 points(filter(data_lb.d.c, F == 0 & I == 0 & J == 0)$diversity, filter(data_lb.d.c, F == 0 & I == 0 & J == 0)$leaf_biom, col = "black", pch = 1, cex=1.25)
@@ -427,6 +430,7 @@ points(filter(data_lb.d.c, F == 1 & I == 1 & J == 0)$diversity, filter(data_lb.d
 points(filter(data_lb.d.c, F == 1 & I == 0 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 0 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
+points(seq.div[101:1001], prediction1.2.CI$fit, type = 'l', lty = "solid", lwd = 2, col = "black") # fitted model
 points(filter(data_lb.d.c, F == 0 & I == 1 & J == 0)$diversity, filter(data_lb.d.c, F == 0 & I == 1 & J == 0)$leaf_biom, col = "forestgreen", pch = 16, cex=1.5)
 points(seq.div[101:601], LCI_F0.I1.J0$yvar[101:601], type = 'l', lty = "solid", lwd = 2, col = "forestgreen")
 legend(x = "topleft", inset=c(0,0), legend = "E-045", bty = "n", cex = 1.2)
@@ -438,6 +442,7 @@ plot(leaf_biom ~ diversity, data = data_lb.d.c, type = "n",
      ylab = "",
      ylim = c(5, 65),
      xlim = c(-0.25,10.5))
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction1.2.CI$lwr, rev(prediction1.2.CI$upr)), col = rgb(0.2,0.2,0.2,0.2), border = NA) # fitted model
 polygon(c(seq.div[101:601], rev(seq.div[101:601])), c(LCI_F0.I0.J1$LCL[101:601], rev(LCI_F0.I0.J1$UCL[101:601])), col = rgb(0.1,1,0,0.2), border = NA)
 points(filter(biom_data, diversity == 0)$diversity, filter(biom_data, diversity == 0)$leaf_biom, col = "black", pch = 4, cex=1)
 points(filter(data_lb.d.c, F == 0 & I == 0 & J == 0)$diversity, filter(data_lb.d.c, F == 0 & I == 0 & J == 0)$leaf_biom, col = "black", pch = 1, cex=1.25)
@@ -447,6 +452,7 @@ points(filter(data_lb.d.c, F == 1 & I == 1 & J == 0)$diversity, filter(data_lb.d
 points(filter(data_lb.d.c, F == 1 & I == 0 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 0 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
+points(seq.div[101:1001], prediction1.2.CI$fit, type = 'l', lty = "solid", lwd = 2, col = "black") # fitted model
 points(filter(data_lb.d.c, F == 0 & I == 0 & J == 1)$diversity, filter(data_lb.d.c, F == 0 & I == 0 & J == 1)$leaf_biom, col = "forestgreen", pch = 16, cex=1.5)
 points(seq.div[101:601], LCI_F0.I0.J1$yvar[101:601], type = 'l', lty = "solid", lwd = 2, col = "forestgreen")
 legend(x = "topleft", inset=c(0,0), legend = "J-092", bty = "n", cex = 1.2)
@@ -458,6 +464,7 @@ plot(leaf_biom ~ diversity, data = data_lb.d.c, type = "n",
      ylab = "Dry leaf biomass (mg)",
      ylim = c(5, 65),
      xlim = c(-0.25,10.5))
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction1.2.CI$lwr, rev(prediction1.2.CI$upr)), col = rgb(0.2,0.2,0.2,0.2), border = NA) # fitted model
 polygon(c(seq.div[201:1001], rev(seq.div[201:1001])), c(LCI_F1.I1.J0$LCL[201:1001], rev(LCI_F1.I1.J0$UCL[201:1001])), col = rgb(0.1,1,0,0.2), border = NA)
 points(filter(biom_data, diversity == 0)$diversity, filter(biom_data, diversity == 0)$leaf_biom, col = "black", pch = 4, cex=1)
 points(filter(data_lb.d.c, F == 0 & I == 0 & J == 0)$diversity, filter(data_lb.d.c, F == 0 & I == 0 & J == 0)$leaf_biom, col = "black", pch = 1, cex=1.25)
@@ -467,6 +474,7 @@ points(filter(data_lb.d.c, F == 0 & I == 0 & J == 1)$diversity, filter(data_lb.d
 points(filter(data_lb.d.c, F == 1 & I == 0 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 0 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
+points(seq.div[101:1001], prediction1.2.CI$fit, type = 'l', lty = "solid", lwd = 2, col = "black") # fitted model
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 0)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 0)$leaf_biom, col = "forestgreen", pch = 16, cex=1.5)
 points(seq.div[201:1001], LCI_F1.I1.J0$yvar[201:1001], type = 'l', lty = "solid", lwd = 2, col = "forestgreen")
 legend(x = "topleft", inset=c(0,0), legend = "J-067 & E-045", bty = "n", cex = 1.2)
@@ -478,6 +486,7 @@ plot(leaf_biom ~ diversity, data = data_lb.d.c, type = "n",
      ylab = "",
      ylim = c(5, 65),
      xlim = c(-0.25,10.5))
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction1.2.CI$lwr, rev(prediction1.2.CI$upr)), col = rgb(0.2,0.2,0.2,0.2), border = NA) # fitted model
 polygon(c(seq.div[801:1001], rev(seq.div[801:1001])), c(LCI_F1.I0.J1$LCL[801:1001], rev(LCI_F1.I0.J1$UCL[801:1001])), col = rgb(0.1,1,0,0.2), border = NA)
 points(filter(biom_data, diversity == 0)$diversity, filter(biom_data, diversity == 0)$leaf_biom, col = "black", pch = 4, cex=1)
 points(filter(data_lb.d.c, F == 0 & I == 0 & J == 0)$diversity, filter(data_lb.d.c, F == 0 & I == 0 & J == 0)$leaf_biom, col = "black", pch = 1, cex=1.25)
@@ -487,6 +496,7 @@ points(filter(data_lb.d.c, F == 0 & I == 0 & J == 1)$diversity, filter(data_lb.d
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 0)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 0)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
+points(seq.div[101:1001], prediction1.2.CI$fit, type = 'l', lty = "solid", lwd = 2, col = "black") # fitted model
 points(filter(data_lb.d.c, F == 1 & I == 0 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 0 & J == 1)$leaf_biom, col = "forestgreen", pch = 16, cex=1.5)
 points(seq.div[801:1001], LCI_F1.I0.J1$yvar[801:1001], type = 'l', lty = "solid", lwd = 2, col = "forestgreen")
 legend(x = "topleft", inset=c(0,0), legend = "J-067 & J-092", bty = "n", cex = 1.2)
@@ -494,10 +504,11 @@ legend(x = "topleft", inset=c(0,0), legend = "J-067 & J-092", bty = "n", cex = 1
 # F0-I1-J1
 plot(leaf_biom ~ diversity, data = data_lb.d.c, type = "n",
      pch = 1, cex = 1, col = "black", cex.lab = 1.3,
-     xlab = "Strain richness",
+     xlab = "Inoculated strain richness",
      ylab = "",
      ylim = c(5, 65),
      xlim = c(-0.25,10.5))
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction1.2.CI$lwr, rev(prediction1.2.CI$upr)), col = rgb(0.2,0.2,0.2,0.2), border = NA) # fitted model
 polygon(c(seq.div[401:1001], rev(seq.div[401:1001])), c(LCI_F0.I1.J1$LCL[401:1001], rev(LCI_F0.I1.J1$UCL[401:1001])), col = rgb(0.1,1,0,0.2), border = NA)
 points(filter(biom_data, diversity == 0)$diversity, filter(biom_data, diversity == 0)$leaf_biom, col = "black", pch = 4, cex=1)
 points(filter(data_lb.d.c, F == 0 & I == 0 & J == 0)$diversity, filter(data_lb.d.c, F == 0 & I == 0 & J == 0)$leaf_biom, col = "black", pch = 1, cex=1.25)
@@ -507,6 +518,7 @@ points(filter(data_lb.d.c, F == 0 & I == 0 & J == 1)$diversity, filter(data_lb.d
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 0)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 0)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 1 & I == 0 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 0 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
+points(seq.div[101:1001], prediction1.2.CI$fit, type = 'l', lty = "solid", lwd = 2, col = "black") # fitted model
 points(filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$leaf_biom, col = "forestgreen", pch = 16, cex=1.5)
 points(seq.div[401:1001], LCI_F0.I1.J1$yvar[401:1001], type = 'l', lty = "solid", lwd = 2, col = "forestgreen")
 legend(x = "topleft", inset=c(0,0), legend = "E-045 & J-092", bty = "n", cex = 1.2)
@@ -514,10 +526,11 @@ legend(x = "topleft", inset=c(0,0), legend = "E-045 & J-092", bty = "n", cex = 1
 # F0-IO-J0
 plot(leaf_biom ~ diversity, data = data_lb.d.c, type = "n",
      pch = 1, cex = 1, col = "black", cex.lab = 1.3,
-     xlab = "Strain richness",
+     xlab = "Inoculated strain richness",
      ylab = "Dry leaf biomass (mg)",
      ylim = c(5, 65),
      xlim = c(-0.25,10.5))
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction1.2.CI$lwr, rev(prediction1.2.CI$upr)), col = rgb(0.2,0.2,0.2,0.2), border = NA) # fitted model
 polygon(c(seq.div[101:401], rev(seq.div[101:401])), c(LCI_F0.I0.J0$LCL[101:401], rev(LCI_F0.I0.J0$UCL[101:401])), col = rgb(0.1,1,0,0.2), border = NA)
 points(filter(biom_data, diversity == 0)$diversity, filter(biom_data, diversity == 0)$leaf_biom, col = "black", pch = 4, cex=1)
 points(filter(data_lb.d.c, F == 1 & I == 0 & J == 0)$diversity, filter(data_lb.d.c, F == 1 & I == 0 & J == 0)$leaf_biom, col = "black", pch = 1, cex=1.25)
@@ -527,6 +540,7 @@ points(filter(data_lb.d.c, F == 1 & I == 1 & J == 0)$diversity, filter(data_lb.d
 points(filter(data_lb.d.c, F == 1 & I == 0 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 0 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
+points(seq.div[101:1001], prediction1.2.CI$fit, type = 'l', lty = "solid", lwd = 2, col = "black") # fitted model
 points(filter(data_lb.d.c, F == 0 & I == 0 & J == 0)$diversity, filter(data_lb.d.c, F == 0 & I == 0 & J == 0)$leaf_biom, col = "forestgreen", pch = 16, cex=1.5)
 points(seq.div[101:401], LCI_F0.I0.J0$yvar[101:401], type = 'l', lty = "solid", lwd = 2, col = "forestgreen")
 legend(x = "topleft", inset=c(0,0), legend = "Other strains only", bty = "n", cex = 1.2)
@@ -534,10 +548,11 @@ legend(x = "topleft", inset=c(0,0), legend = "Other strains only", bty = "n", ce
 # F0-I1-J1
 plot(leaf_biom ~ diversity, data = data_lb.d.c, type = "n",
      pch = 1, cex = 1, col = "black", cex.lab = 1.3,
-     xlab = "Strain richness",
+     xlab = "Inoculated strain richness",
      ylab = "",
      ylim = c(5, 65),
      xlim = c(-0.25,10.5))
+polygon(c(seq.div[101:1001], rev(seq.div[101:1001])), c(prediction1.2.CI$lwr, rev(prediction1.2.CI$upr)), col = rgb(0.2,0.2,0.2,0.2), border = NA) # fitted model
 polygon(c(seq.div[601:1001], rev(seq.div[601:1001])), c(LCI_F1.I1.J1$LCL[601:1001], rev(LCI_F1.I1.J1$UCL[601:1001])), col = rgb(0.1,1,0,0.2), border = NA)
 points(filter(biom_data, diversity == 0)$diversity, filter(biom_data, diversity == 0)$leaf_biom, col = "black", pch = 4, cex=1)
 points(filter(data_lb.d.c, F == 0 & I == 0 & J == 0)$diversity, filter(data_lb.d.c, F == 0 & I == 0 & J == 0)$leaf_biom, col = "black", pch = 1, cex=1.25)
@@ -547,6 +562,7 @@ points(filter(data_lb.d.c, F == 0 & I == 0 & J == 1)$diversity, filter(data_lb.d
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 0)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 0)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 1 & I == 0 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 0 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
 points(filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 0 & I == 1 & J == 1)$leaf_biom, col = "black", pch = 1, cex=1.25)
+points(seq.div[101:1001], prediction1.2.CI$fit, type = 'l', lty = "solid", lwd = 2, col = "black") # fitted model
 points(filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$diversity, filter(data_lb.d.c, F == 1 & I == 1 & J == 1)$leaf_biom, col = "forestgreen", pch = 16, cex=1.5)
 points(seq.div[601:1001], LCI_F1.I1.J1$yvar[601:1001], type = 'l', lty = "solid", lwd = 2, col = "forestgreen")
 legend(x = "topleft", inset=c(0,0), legend = "J-067, E-045 & J-092", bty = "n", cex = 1.2)
@@ -772,12 +788,12 @@ prediction.mod_obs <- data.frame(predict(mod_obs, newdata=data.frame(diversity=s
 
 ### Appendix 1: Figure S5; panels of the four models ----
 
-tiff(filename = "./figures/alternative_and_obs_models.tiff", width = 6, height = 6, units = "in", pointsize = 4, res=300)
+tiff(filename = "./figures/alternative_and_obs_models_v7.tiff", width = 6, height = 6, units = "in", pointsize = 4, res=300)
 par(mfrow=c(2,2), mar=c(4.1, 4.1, 1.1, 1.1), font.lab = 2, cex = 1.3, cex.axis = 1.3) # margins order : bottom, left, top and right
 
 plot(pred_avg ~ diversity, data = data.CS2,
      pch = 5, cex = 1, col = "blue", cex.lab = 1.3,
-     xlab = "Strain richness",
+     xlab = "Inoculated strain richness",
      ylab = "Dry leaf biomass (mg)",
      ylim = c(0, 65),
      xlim = c(-0.25,10.5))
@@ -788,7 +804,7 @@ text(0, 64, "a", cex=1.8)
 
 plot(pred_max ~ diversity, data = data.CS2,
      pch = 2, cex = 1, col = "red", cex.lab = 1.3,
-     xlab = "Strain richness",
+     xlab = "Inoculated strain richness",
      ylab = "Dry leaf biomass (mg)",
      ylim = c(0, 65),
      xlim = c(-0.25,10.5))
@@ -799,7 +815,7 @@ text(0, 64, "b", cex=1.8)
 
 plot(pred_min ~ diversity, data = data.CS2,
      pch = 6, cex = 1, col = "orange", cex.lab = 1.3,
-     xlab = "Strain richness",
+     xlab = "Inoculated strain richness",
      ylab = "Dry leaf biomass (mg)",
      ylim = c(0, 65),
      xlim = c(-0.25,10.5))
@@ -810,7 +826,7 @@ text(0, 64, "c", cex=1.8)
 
 plot(leaf_biom ~ diversity, data = data.CS2,
      pch = 1, cex = 1, col = "black", cex.lab = 1.3,
-     xlab = "Strain richness",
+     xlab = "Inoculated strain richness",
      ylab = "Dry leaf biomass (mg)",
      ylim = c(0, 65),
      xlim = c(-0.25,10.5))
@@ -825,11 +841,11 @@ dev.off()
 
 ### Figure 4 - Observed data with all 4 models predictions ----
 
-tiff(filename = "./figures/comp_vs_select_predictions.tiff", width = 6, height = 5, units = "in", pointsize = 9, res=300)
+tiff(filename = "./figures/comp_vs_select_predictions_v7.tiff", width = 6, height = 5, units = "in", pointsize = 9, res=300)
 par(mfrow=c(1,1), mar=c(4.1, 4.1, 1.1, 1.1), font.lab = 2, cex = 1.3, cex.axis = 1.3) # margins order : bottom, left, top and right
 plot(pred_avg ~ diversity, data = data.CS2, type = "n",
      pch = 1, cex = 1, col = "black", cex.lab = 1.3,
-     xlab = "Strain richness",
+     xlab = "Inoculated strain richness",
      ylab = "Dry leaf biomass (mg)",
      ylim = c(5, 65),
      xlim = c(-0.25,10.5))
